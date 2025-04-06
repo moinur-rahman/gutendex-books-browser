@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gutendex Books Browser</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Gutendex Books Browser</h1>
+      <p>Explore the collection of Project Gutenberg books</p>
+    </header>
+
+    <main>
+      <div id="loading">Loading book data...</div>
+      <div id="error" class="hidden"></div>
+      <div id="books-container" class="books-grid"></div>
+    </main>
+
+    <footer>
+      <p>
+        Data provided by
+        <a href="https://gutendex.com/" target="_blank">Gutendex API</a>
+      </p>
+    </footer>
+
+    <script src="js/script.js"></script>
+  </body>
+</html>
