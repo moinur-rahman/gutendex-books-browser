@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
     booksContainer.innerHTML = "";
     loadingElement.classList.remove("hidden");
     errorElement.classList.add("hidden");
-    fetchBooks("", "", wishlistIds);
+    fetchBooks(currentSearchTerm, currentGenre, wishlistIds);
   }
 
   searchInput.addEventListener("input", (e) => {
@@ -171,7 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!books || books.length === 0) {
       errorElement.classList.remove("hidden");
       errorElement.textContent = showingWishlist
-        ? "Your wishlist is empty. Add some books by clicking the heart icon."
+        ? "No wishlist books match your current filters."
         : "No books found matching your search.";
       return;
     }
