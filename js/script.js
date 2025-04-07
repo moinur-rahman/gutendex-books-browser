@@ -172,7 +172,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     ? `<img src="${coverImage}" alt="Cover for ${title}">`
                     : "<div>No cover available</div>"
                 }
-                <button class="${wishlistIconClass}" data-book-id="${bookId}">♥</button>
             </div>
             <div class="book-info">
                 <h2 class="book-title">${title}</h2>
@@ -204,6 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <span class="book-id">ID: ${bookId}</span>
                 </div>
             </div>
+            <button class="${wishlistIconClass}" data-book-id="${bookId}">♥</button>
         `;
 
     bookCard.innerHTML = cardContent;
