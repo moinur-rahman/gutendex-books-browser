@@ -6,6 +6,8 @@
   --border-color: #ddd;
   --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   --heart-color: #e74c3c;
+  --heart-color-hover: #c0392b;
+  --heart-inactive-color: #7f8c8d;
 }
 
 * {
@@ -186,29 +188,47 @@ a:hover {
   position: absolute;
   bottom: 10px;
   right: 10px;
-  background: rgba(255, 255, 255, 0.8);
-  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid var(--heart-inactive-color);
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  font-size: 20px;
+  width: 42px;
+  height: 42px;
+  font-size: 24px;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  color: #999;
+  color: var(--heart-inactive-color);
   transition: all 0.2s ease;
   z-index: 2;
   padding: 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .wishlist-icon:hover {
   background: white;
-  transform: scale(1.1);
+  transform: scale(1.15);
+  color: var(--heart-color);
+  border-color: var(--heart-color);
 }
 
 .wishlist-icon.active {
   color: var(--heart-color);
+  background-color: white;
+  border-color: var(--heart-color);
+  animation: pulse 0.4s ease-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .book-info {
