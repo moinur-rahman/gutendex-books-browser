@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
     saveWishlist();
 
     if (showingWishlist) {
-      displayFilteredBooks();
+      fetchWishlistBooks();
     }
   }
 
@@ -45,13 +45,33 @@ document.addEventListener("DOMContentLoaded", () => {
     return !!wishlist[bookId];
   }
 
+  function getWishlistIds() {
+    return Object.keys(wishlist);
+  }
+
   function displayFilteredBooks() {
     if (showingWishlist) {
-      const wishlistedBooks = allBooks.filter((book) => isWishlisted(book.id));
-      displayBooks(wishlistedBooks);
+      fetchWishlistBooks();
     } else {
       displayBooks(allBooks);
     }
+  }
+
+  function fetchWishlistBooks() {
+    const wishlistIds = getWishlistIds();
+    if (wishlistIds.length === 0) {
+      errorElement.classList.remove("hidden");
+      errorElement.textContent =
+        "Your wishlist is empty. Add some books by clicking the heart icon.";
+      booksContainer.innerHTML = "";
+      loadingElement.classList.add("hidden");
+      return;
+    }
+
+    booksContainer.innerHTML = "";
+    loadingElement.classList.remove("hidden");
+    errorElement.classList.add("hidden");
+    fetchBooks("", "", wishlistIds);
   }
 
   searchInput.addEventListener("input", (e) => {
@@ -64,7 +84,12 @@ document.addEventListener("DOMContentLoaded", () => {
       booksContainer.innerHTML = "";
       loadingElement.classList.remove("hidden");
       errorElement.classList.add("hidden");
-      fetchBooks(currentSearchTerm, currentGenre);
+
+      if (showingWishlist) {
+        fetchWishlistBooks();
+      } else {
+        fetchBooks(currentSearchTerm, currentGenre);
+      }
     }, 500);
   });
 
@@ -73,7 +98,12 @@ document.addEventListener("DOMContentLoaded", () => {
     booksContainer.innerHTML = "";
     loadingElement.classList.remove("hidden");
     errorElement.classList.add("hidden");
-    fetchBooks(currentSearchTerm, currentGenre);
+
+    if (showingWishlist) {
+      fetchWishlistBooks();
+    } else {
+      fetchBooks(currentSearchTerm, currentGenre);
+    }
   });
 
   wishlistToggle.addEventListener("click", () => {
@@ -83,13 +113,21 @@ document.addEventListener("DOMContentLoaded", () => {
       : "Show Wishlist";
     wishlistToggle.classList.toggle("active");
 
-    displayFilteredBooks();
+    if (showingWishlist) {
+      fetchWishlistBooks();
+    } else {
+      fetchBooks(currentSearchTerm, currentGenre);
+    }
   });
 
-  async function fetchBooks(searchTerm = "", genre = "") {
+  async function fetchBooks(searchTerm = "", genre = "", bookIds = []) {
     try {
       let url = API_URL;
       const params = [];
+
+      if (bookIds.length > 0) {
+        params.push(`ids=${bookIds.join(",")}`);
+      }
 
       if (searchTerm) {
         params.push(`search=${encodeURIComponent(searchTerm)}`);
@@ -110,8 +148,13 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const data = await response.json();
-      allBooks = data.results;
-      displayFilteredBooks();
+
+      if (bookIds.length > 0) {
+        displayBooks(data.results);
+      } else {
+        allBooks = data.results;
+        displayBooks(allBooks);
+      }
 
       loadingElement.classList.add("hidden");
     } catch (error) {
@@ -164,7 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const wishlistIconClass = isWishlisted(bookId)
       ? "wishlist-icon active"
       : "wishlist-icon";
-    
+
     const wishlistButtonTitle = isWishlisted(bookId)
       ? "Remove from wishlist"
       : "Add to wishlist";
@@ -218,7 +261,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const id = wishlistBtn.getAttribute("data-book-id");
       toggleWishlist(id);
       wishlistBtn.classList.toggle("active");
-      wishlistBtn.title = isWishlisted(id) ? "Remove from wishlist" : "Add to wishlist";
+      wishlistBtn.title = isWishlisted(id)
+        ? "Remove from wishlist"
+        : "Add to wishlist";
     });
 
     return bookCard;
