@@ -2,14 +2,35 @@ document.addEventListener("DOMContentLoaded", () => {
   const booksContainer = document.getElementById("books-container");
   const loadingElement = document.getElementById("loading");
   const errorElement = document.getElementById("error");
+  const searchInput = document.getElementById("search-input");
 
   const API_URL = "https://gutendex.com/books";
+  let searchTimeout = null;
 
   fetchBooks();
 
-  async function fetchBooks() {
+  searchInput.addEventListener("input", (e) => {
+    clearTimeout(searchTimeout);
+
+    const searchTerm = e.target.value.trim();
+
+    searchTimeout = setTimeout(() => {
+      booksContainer.innerHTML = "";
+      loadingElement.classList.remove("hidden");
+      errorElement.classList.add("hidden");
+      fetchBooks(searchTerm);
+    }, 500);
+  });
+
+  async function fetchBooks(searchTerm = "") {
     try {
-      const response = await fetch(API_URL);
+      let url = API_URL;
+
+      if (searchTerm) {
+        url = `${API_URL}?search=${encodeURIComponent(searchTerm)}`;
+      }
+
+      const response = await fetch(url);
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -28,9 +49,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function displayBooks(books) {
+    booksContainer.innerHTML = "";
+
     if (!books || books.length === 0) {
       errorElement.classList.remove("hidden");
-      errorElement.textContent = "No books found.";
+      errorElement.textContent = "No books found matching your search.";
       return;
     }
 
