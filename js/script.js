@@ -5,6 +5,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("search-input");
   const genreSelect = document.getElementById("genre-select");
   const wishlistToggle = document.getElementById("wishlist-toggle");
+  const paginationContainer = document.getElementById("pagination-container");
+  const prevPageBtn = document.getElementById("prev-page");
+  const nextPageBtn = document.getElementById("next-page");
+  const pageNumbersContainer = document.getElementById("page-numbers");
 
   const API_URL = "https://gutendex.com/books";
   let searchTimeout = null;
@@ -13,6 +17,12 @@ document.addEventListener("DOMContentLoaded", () => {
   let wishlist = {};
   let showingWishlist = false;
   let allBooks = [];
+  let currentPage = 1;
+  let totalBooks = 0;
+  let nextPageUrl = null;
+  let prevPageUrl = null;
+  let totalPages = 0;
+  const BOOKS_PER_PAGE = 32;
 
   loadWishlist();
   fetchBooks();
@@ -65,6 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
         "Your wishlist is empty. Add some books by clicking the heart icon.";
       booksContainer.innerHTML = "";
       loadingElement.classList.add("hidden");
+      paginationContainer.style.display = "none";
       return;
     }
 
@@ -81,6 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     searchTimeout = setTimeout(() => {
       currentSearchTerm = searchTerm;
+      currentPage = 1;
       booksContainer.innerHTML = "";
       loadingElement.classList.remove("hidden");
       errorElement.classList.add("hidden");
@@ -95,6 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   genreSelect.addEventListener("change", (e) => {
     currentGenre = e.target.value;
+    currentPage = 1;
     booksContainer.innerHTML = "";
     loadingElement.classList.remove("hidden");
     errorElement.classList.add("hidden");
@@ -112,6 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ? "Show All Books"
       : "Show Wishlist";
     wishlistToggle.classList.toggle("active");
+    currentPage = 1;
 
     if (showingWishlist) {
       fetchWishlistBooks();
@@ -120,10 +134,144 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  async function fetchBooks(searchTerm = "", genre = "", bookIds = []) {
+  prevPageBtn.addEventListener("click", () => {
+    if (prevPageUrl) {
+      loadingElement.classList.remove("hidden");
+      booksContainer.innerHTML = "";
+      loadPageFromUrl(prevPageUrl);
+    }
+  });
+
+  nextPageBtn.addEventListener("click", () => {
+    if (nextPageUrl) {
+      loadingElement.classList.remove("hidden");
+      booksContainer.innerHTML = "";
+      loadPageFromUrl(nextPageUrl);
+    }
+  });
+
+  async function loadPageFromUrl(url) {
+    try {
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      updatePaginationData(data);
+      displayBooks(data.results);
+      updatePaginationUI();
+      loadingElement.classList.add("hidden");
+    } catch (error) {
+      handleFetchError(error);
+    }
+  }
+
+  function updatePaginationData(data) {
+    totalBooks = data.count;
+    nextPageUrl = data.next;
+    prevPageUrl = data.previous;
+    totalPages = Math.ceil(totalBooks / BOOKS_PER_PAGE);
+
+    if (prevPageUrl) {
+      const urlParams = new URLSearchParams(new URL(prevPageUrl).search);
+      const prevPage = urlParams.get("page");
+      currentPage = prevPage ? parseInt(prevPage) + 1 : 1;
+    } else if (nextPageUrl) {
+      const urlParams = new URLSearchParams(new URL(nextPageUrl).search);
+      const nextPage = urlParams.get("page");
+      currentPage = nextPage ? parseInt(nextPage) - 1 : 1;
+    } else {
+      currentPage = 1;
+    }
+  }
+
+  function updatePaginationUI() {
+    if (totalBooks <= BOOKS_PER_PAGE) {
+      paginationContainer.style.display = "none";
+      return;
+    }
+
+    paginationContainer.style.display = "flex";
+    prevPageBtn.disabled = !prevPageUrl;
+    nextPageBtn.disabled = !nextPageUrl;
+
+    pageNumbersContainer.innerHTML = "";
+
+    const maxPageButtons = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+    let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+    if (endPage - startPage + 1 < maxPageButtons && startPage > 1) {
+      startPage = Math.max(1, endPage - maxPageButtons + 1);
+    }
+
+    if (startPage > 1) {
+      appendPageNumber(1);
+      if (startPage > 2) {
+        appendEllipsis();
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      appendPageNumber(i);
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        appendEllipsis();
+      }
+      appendPageNumber(totalPages);
+    }
+  }
+
+  function appendPageNumber(pageNum) {
+    const pageBtn = document.createElement("button");
+    pageBtn.className = "page-num";
+    pageBtn.textContent = pageNum;
+
+    if (pageNum === currentPage) {
+      pageBtn.classList.add("current");
+    }
+
+    pageBtn.addEventListener("click", () => {
+      if (pageNum !== currentPage) {
+        currentPage = pageNum;
+        loadingElement.classList.remove("hidden");
+        booksContainer.innerHTML = "";
+        fetchBooks(
+          currentSearchTerm,
+          currentGenre,
+          showingWishlist ? getWishlistIds() : [],
+          pageNum
+        );
+      }
+    });
+
+    pageNumbersContainer.appendChild(pageBtn);
+  }
+
+  function appendEllipsis() {
+    const ellipsis = document.createElement("span");
+    ellipsis.className = "ellipsis";
+    ellipsis.textContent = "...";
+    pageNumbersContainer.appendChild(ellipsis);
+  }
+
+  async function fetchBooks(
+    searchTerm = "",
+    genre = "",
+    bookIds = [],
+    page = 1
+  ) {
     try {
       let url = API_URL;
       const params = [];
+
+      if (page > 1) {
+        params.push(`page=${page}`);
+      }
 
       if (bookIds.length > 0) {
         params.push(`ids=${bookIds.join(",")}`);
@@ -148,6 +296,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const data = await response.json();
+      updatePaginationData(data);
 
       if (bookIds.length > 0) {
         displayBooks(data.results);
@@ -156,13 +305,19 @@ document.addEventListener("DOMContentLoaded", () => {
         displayBooks(allBooks);
       }
 
+      updatePaginationUI();
       loadingElement.classList.add("hidden");
     } catch (error) {
-      loadingElement.classList.add("hidden");
-      errorElement.classList.remove("hidden");
-      errorElement.textContent = `Error fetching books: ${error.message}`;
-      console.error("Error fetching books:", error);
+      handleFetchError(error);
     }
+  }
+
+  function handleFetchError(error) {
+    loadingElement.classList.add("hidden");
+    errorElement.classList.remove("hidden");
+    errorElement.textContent = `Error fetching books: ${error.message}`;
+    console.error("Error fetching books:", error);
+    paginationContainer.style.display = "none";
   }
 
   function displayBooks(books) {
@@ -173,9 +328,11 @@ document.addEventListener("DOMContentLoaded", () => {
       errorElement.textContent = showingWishlist
         ? "No wishlist books match your current filters."
         : "No books found matching your search.";
+      paginationContainer.style.display = "none";
       return;
     }
 
+    errorElement.classList.add("hidden");
     books.forEach((book) => {
       const bookCard = createBookCard(book);
       booksContainer.appendChild(bookCard);
