@@ -164,6 +164,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const wishlistIconClass = isWishlisted(bookId)
       ? "wishlist-icon active"
       : "wishlist-icon";
+    
+    const wishlistButtonTitle = isWishlisted(bookId)
+      ? "Remove from wishlist"
+      : "Add to wishlist";
 
     const cardContent = `
             <div class="book-cover">
@@ -203,7 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <span class="book-id">ID: ${bookId}</span>
                 </div>
             </div>
-            <button class="${wishlistIconClass}" data-book-id="${bookId}">♥</button>
+            <button class="${wishlistIconClass}" data-book-id="${bookId}" title="${wishlistButtonTitle}">♥</button>
         `;
 
     bookCard.innerHTML = cardContent;
@@ -214,6 +218,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const id = wishlistBtn.getAttribute("data-book-id");
       toggleWishlist(id);
       wishlistBtn.classList.toggle("active");
+      wishlistBtn.title = isWishlisted(id) ? "Remove from wishlist" : "Add to wishlist";
     });
 
     return bookCard;
