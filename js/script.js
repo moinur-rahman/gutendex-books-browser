@@ -3,9 +3,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const loadingElement = document.getElementById("loading");
   const errorElement = document.getElementById("error");
   const searchInput = document.getElementById("search-input");
+  const genreSelect = document.getElementById("genre-select");
 
   const API_URL = "https://gutendex.com/books";
   let searchTimeout = null;
+  let currentSearchTerm = "";
+  let currentGenre = "";
 
   fetchBooks();
 
@@ -15,19 +18,37 @@ document.addEventListener("DOMContentLoaded", () => {
     const searchTerm = e.target.value.trim();
 
     searchTimeout = setTimeout(() => {
+      currentSearchTerm = searchTerm;
       booksContainer.innerHTML = "";
       loadingElement.classList.remove("hidden");
       errorElement.classList.add("hidden");
-      fetchBooks(searchTerm);
+      fetchBooks(currentSearchTerm, currentGenre);
     }, 500);
   });
 
-  async function fetchBooks(searchTerm = "") {
+  genreSelect.addEventListener("change", (e) => {
+    currentGenre = e.target.value;
+    booksContainer.innerHTML = "";
+    loadingElement.classList.remove("hidden");
+    errorElement.classList.add("hidden");
+    fetchBooks(currentSearchTerm, currentGenre);
+  });
+
+  async function fetchBooks(searchTerm = "", genre = "") {
     try {
       let url = API_URL;
+      const params = [];
 
       if (searchTerm) {
-        url = `${API_URL}?search=${encodeURIComponent(searchTerm)}`;
+        params.push(`search=${encodeURIComponent(searchTerm)}`);
+      }
+
+      if (genre) {
+        params.push(`topic=${encodeURIComponent(genre)}`);
+      }
+
+      if (params.length > 0) {
+        url = `${API_URL}?${params.join("&")}`;
       }
 
       const response = await fetch(url);

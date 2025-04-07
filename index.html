@@ -13,12 +13,29 @@
     </header>
 
     <main>
-      <div class="search-container">
-        <input
-          type="text"
-          id="search-input"
-          placeholder="Search books by title or author..."
-        />
+      <div class="filters-container">
+        <div class="search-container">
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Search books by title or author..."
+          />
+        </div>
+        <div class="genre-container">
+          <select id="genre-select">
+            <option value="">All Genres</option>
+            <option value="fiction">Fiction</option>
+            <option value="romance">Romance</option>
+            <option value="fantasy">Fantasy</option>
+            <option value="science">Science</option>
+            <option value="adventure">Adventure</option>
+            <option value="history">History</option>
+            <option value="biography">Biography</option>
+            <option value="poetry">Poetry</option>
+            <option value="drama">Drama</option>
+            <option value="children">Children</option>
+          </select>
+        </div>
       </div>
       <div id="loading">Loading book data...</div>
       <div id="error" class="hidden"></div>
