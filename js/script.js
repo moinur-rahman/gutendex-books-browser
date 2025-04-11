@@ -4,7 +4,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const errorElement = document.getElementById("error");
   const searchInput = document.getElementById("search-input");
   const genreSelect = document.getElementById("genre-select");
-  const wishlistToggle = document.getElementById("wishlist-toggle");
+  const navHome = document.getElementById("nav-home");
+  const navWishlist = document.getElementById("nav-wishlist");
   const paginationContainer = document.getElementById("pagination-container");
   const prevPageBtn = document.getElementById("prev-page");
   const nextPageBtn = document.getElementById("next-page");
@@ -15,7 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentSearchTerm = "";
   let currentGenre = "";
   let wishlist = {};
-  let showingWishlist = false;
   let allBooks = [];
   let currentPage = 1;
   let totalBooks = 0;
@@ -24,8 +24,29 @@ document.addEventListener("DOMContentLoaded", () => {
   let totalPages = 0;
   const BOOKS_PER_PAGE = 32;
 
+  let currentRoute = window.location.hash || "#home";
+
   loadWishlist();
-  fetchBooks();
+  handleRouteChange();
+
+  window.addEventListener("hashchange", handleRouteChange);
+
+  function handleRouteChange() {
+    currentRoute = window.location.hash || "#home";
+
+    const navLinks = document.querySelectorAll(".nav-link");
+    navLinks.forEach((link) => {
+      link.classList.remove("active");
+    });
+
+    if (currentRoute === "#home" || currentRoute === "") {
+      navHome.classList.add("active");
+      fetchBooks(currentSearchTerm, currentGenre);
+    } else if (currentRoute === "#wishlist") {
+      navWishlist.classList.add("active");
+      fetchWishlistBooks();
+    }
+  }
 
   function loadWishlist() {
     const storedWishlist = localStorage.getItem("gutendexWishlist");
@@ -46,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     saveWishlist();
 
-    if (showingWishlist) {
+    if (currentRoute === "#wishlist") {
       fetchWishlistBooks();
     }
   }
@@ -60,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function displayFilteredBooks() {
-    if (showingWishlist) {
+    if (currentRoute === "#wishlist") {
       fetchWishlistBooks();
     } else {
       displayBooks(allBooks);
@@ -97,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
       loadingElement.classList.remove("hidden");
       errorElement.classList.add("hidden");
 
-      if (showingWishlist) {
+      if (currentRoute === "#wishlist") {
         fetchWishlistBooks();
       } else {
         fetchBooks(currentSearchTerm, currentGenre);
@@ -112,26 +133,19 @@ document.addEventListener("DOMContentLoaded", () => {
     loadingElement.classList.remove("hidden");
     errorElement.classList.add("hidden");
 
-    if (showingWishlist) {
+    if (currentRoute === "#wishlist") {
       fetchWishlistBooks();
     } else {
       fetchBooks(currentSearchTerm, currentGenre);
     }
   });
 
-  wishlistToggle.addEventListener("click", () => {
-    showingWishlist = !showingWishlist;
-    wishlistToggle.textContent = showingWishlist
-      ? "Show All Books"
-      : "Show Wishlist";
-    wishlistToggle.classList.toggle("active");
-    currentPage = 1;
+  navHome.addEventListener("click", (e) => {
+    window.location.hash = "home";
+  });
 
-    if (showingWishlist) {
-      fetchWishlistBooks();
-    } else {
-      fetchBooks(currentSearchTerm, currentGenre);
-    }
+  navWishlist.addEventListener("click", (e) => {
+    window.location.hash = "wishlist";
   });
 
   prevPageBtn.addEventListener("click", () => {

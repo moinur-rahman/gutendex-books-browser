@@ -10,6 +10,16 @@
     <header>
       <h1>Gutendex Books Browser</h1>
       <p>Explore the collection of Project Gutenberg books</p>
+      <nav class="main-nav">
+        <ul>
+          <li>
+            <a href="#home" id="nav-home" class="nav-link active">Home</a>
+          </li>
+          <li>
+            <a href="#wishlist" id="nav-wishlist" class="nav-link">Wishlist</a>
+          </li>
+        </ul>
+      </nav>
     </header>
 
     <main>
@@ -35,11 +45,6 @@
             <option value="drama">Drama</option>
             <option value="children">Children</option>
           </select>
-        </div>
-        <div class="wishlist-filter">
-          <button id="wishlist-toggle" class="wishlist-toggle">
-            Show Wishlist
-          </button>
         </div>
       </div>
       <div id="loading">Loading book data...</div>
