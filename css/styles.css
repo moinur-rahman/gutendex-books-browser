@@ -422,6 +422,7 @@ a:hover {
   border-radius: 8px;
   box-shadow: var(--card-shadow);
   overflow: hidden;
+  grid-column: 1 / -1;
 }
 
 .details-header {
