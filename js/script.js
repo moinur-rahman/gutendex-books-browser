@@ -289,7 +289,7 @@ document.addEventListener("DOMContentLoaded", () => {
         fetchBooks(
           currentSearchTerm,
           currentGenre,
-          showingWishlist ? getWishlistIds() : [],
+          currentRoute === "#wishlist" ? getWishlistIds() : [],
           pageNum
         );
       }
@@ -371,9 +371,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!books || books.length === 0) {
       errorElement.classList.remove("hidden");
-      errorElement.textContent = showingWishlist
-        ? "No wishlist books match your current filters."
-        : "No books found matching your search.";
+      errorElement.textContent =
+        currentRoute === "#wishlist"
+          ? "No wishlist books match your current filters."
+          : "No books found matching your search.";
       paginationContainer.style.display = "none";
       return;
     }
