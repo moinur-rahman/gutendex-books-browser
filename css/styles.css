@@ -196,6 +196,7 @@ a:hover {
   box-shadow: var(--card-shadow);
   transition: transform 0.3s ease;
   position: relative;
+  cursor: pointer;
 }
 
 .book-card:hover {
