@@ -27,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentRoute = window.location.hash || "#home";
 
   loadWishlist();
+  loadUserPreferences();
   handleRouteChange();
 
   window.addEventListener("hashchange", handleRouteChange);
@@ -53,6 +54,26 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.hash = "home";
       }
     }
+  }
+
+  function loadUserPreferences() {
+    const storedPreferences = localStorage.getItem("gutendexPreferences");
+    if (storedPreferences) {
+      const preferences = JSON.parse(storedPreferences);
+      currentSearchTerm = preferences.searchTerm || "";
+      currentGenre = preferences.genre || "";
+
+      searchInput.value = currentSearchTerm;
+      genreSelect.value = currentGenre;
+    }
+  }
+
+  function saveUserPreferences() {
+    const preferences = {
+      searchTerm: currentSearchTerm,
+      genre: currentGenre,
+    };
+    localStorage.setItem("gutendexPreferences", JSON.stringify(preferences));
   }
 
   function loadWishlist() {
@@ -125,6 +146,8 @@ document.addEventListener("DOMContentLoaded", () => {
       loadingElement.classList.remove("hidden");
       errorElement.classList.add("hidden");
 
+      saveUserPreferences();
+
       if (currentRoute === "#wishlist") {
         fetchWishlistBooks();
       } else {
@@ -139,6 +162,8 @@ document.addEventListener("DOMContentLoaded", () => {
     booksContainer.innerHTML = "";
     loadingElement.classList.remove("hidden");
     errorElement.classList.add("hidden");
+
+    saveUserPreferences();
 
     if (currentRoute === "#wishlist") {
       fetchWishlistBooks();
