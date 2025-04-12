@@ -368,6 +368,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const coverImage = book.formats["image/jpeg"] || "";
     const title = book.title || "Unknown Title";
     const bookId = book.id || "N/A";
+    const downloadCount = book.download_count || 0;
 
     const authors =
       book.authors
@@ -427,6 +428,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 <div class="book-meta">
                     <span class="book-id">ID: ${bookId}</span>
+                    <span class="book-downloads">${downloadCount.toLocaleString()} downloads</span>
                 </div>
             </div>
             <button class="${wishlistIconClass}" data-book-id="${bookId}" title="${wishlistButtonTitle}">♥</button>

@@ -284,12 +284,18 @@ a:hover {
   font-size: 0.9rem;
   color: #777;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 0.5rem;
   margin-top: 1rem;
 }
 
 .book-id {
   font-family: monospace;
+}
+
+.book-downloads {
+  color: var(--secondary-color);
+  font-weight: 500;
 }
 
 .book-subjects {
