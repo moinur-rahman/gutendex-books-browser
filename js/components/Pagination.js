@@ -23,14 +23,14 @@ export default class Pagination {
     this.prevPageUrl = data.previous;
     this.totalPages = Math.ceil(this.totalBooks / this.BOOKS_PER_PAGE);
 
-    if (this.prevPageUrl) {
-      const urlParams = new URLSearchParams(new URL(this.prevPageUrl).search);
-      const prevPage = urlParams.get("page");
-      this.currentPage = prevPage ? parseInt(prevPage) + 1 : 1;
-    } else if (this.nextPageUrl) {
+    if (this.nextPageUrl) {
       const urlParams = new URLSearchParams(new URL(this.nextPageUrl).search);
       const nextPage = urlParams.get("page");
       this.currentPage = nextPage ? parseInt(nextPage) - 1 : 1;
+    } else if (this.prevPageUrl) {
+      const urlParams = new URLSearchParams(new URL(this.prevPageUrl).search);
+      const prevPage = urlParams.get("page");
+      this.currentPage = prevPage ? parseInt(prevPage) + 1 : 1;
     } else {
       this.currentPage = 1;
     }
