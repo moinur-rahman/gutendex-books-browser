@@ -71,7 +71,6 @@ header {
   margin: 0 auto 2rem;
   padding: 0 1rem;
   display: flex;
-  flex-wrap: wrap;
   gap: 1rem;
 }
 
@@ -318,9 +317,15 @@ a:hover {
   .books-grid {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   }
+}
 
+@media (max-width: 508px) {
   .filters-container {
     flex-direction: column;
+  }
+
+  .search-container {
+    flex: 1 1 auto;
   }
 
   .genre-container {
